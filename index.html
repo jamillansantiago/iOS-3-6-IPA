@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="App Store">
+    <title>App Store - Genius</title>
+    
+    <style>
+        /* Estilos globales emulando iOS clásico (Helvetica, sin scroll elástico molesto) */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #c5ccd4;
+            color: #000;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Barra de navegación superior con degradado azul clásico */
+        .navbar {
+            background: linear-gradient(to bottom, #768ca7 0%, #3e5675 100%);
+            border-bottom: 1px solid #2d3e54;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        /* Segmented Control (New, What's Hot, Genius) */
+        .segmented-control {
+            display: flex;
+            border: 1px solid #2a3a4e;
+            border-radius: 5px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #536a87, #405774);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .segment {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.6);
+            border-right: 1px solid #2a3a4e;
+            text-decoration: none;
+            background: linear-gradient(to bottom, #637d9d 0%, #4c6687 100%);
+        }
+
+        .segment:last-child {
+            border-right: none;
+        }
+
+        .segment.active {
+            background: linear-gradient(to bottom, #39506e 0%, #536d93 100%);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Lista de aplicaciones */
+        .app-list {
+            background-color: #929ba6;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #717d8a;
+            border-top: 1px solid #b1b9c2;
+            background: linear-gradient(to bottom, #cbd2d9 0%, #b3bcc5 100%);
+            position: relative;
+        }
+
+        /* Icono de la App redondeado estilo iOS antiguo */
+        .app-icon {
+            width: 57px;
+            height: 57px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            margin-right: 12px;
+            background-color: #fff;
+        }
+
+        /* Detalles del texto */
+        .app-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .app-based-on {
+            font-size: 11px;
+            color: #4c566c;
+            margin-bottom: 2px;
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+        }
+
+        /* Estrellas de calificación simuladas */
+        .app-rating {
+            font-size: 11px;
+            color: #4c566c;
+        }
+        .stars {
+            color: #ff9500;
+            margin-right: 4px;
+        }
+
+        /* Botón de precio / Obtener (GET) */
+        .btn-get {
+            background: linear-gradient(to bottom, #fcfcfc 0%, #cbd0d4 100%);
+            border: 1px solid #707070;
+            border-radius: 3px;
+            color: #1956a7;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 6px 10px;
+            min-width: 55px;
+            text-align: center;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.6);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-get:active {
+            background: #b1b6ba;
+        }
+
+        /* Flecha derecha clásica de las celdas de iOS */
+        .arrow-right {
+            width: 8px;
+            height: 13px;
+            margin-left: 10px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 13"><path d="M1.5 1.5 l5 5 -5 5" stroke="%23717d8a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        /* Barra de pestañas inferior fija (Tab Bar) */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 49px;
+            background: linear-gradient(to bottom, #2c2c2c 0%, #000000 100%);
+            border-top: 1px solid #000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            font-size: 10px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .tab-item.active {
+            color: #0088ff;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+            background-color: #555; /* Simulación de icono */
+            border-radius: 4px;
+        }
+        .tab-item.active .tab-icon {
+            background-color: #0088ff;
+        }
+
+        /* Espaciador inferior para que la lista no se tape por el TabBar */
+        .spacer {
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="segmented-control">
+            <a href="#" class="segment">New</a>
+            <a href="#" class="segment">What's Hot</a>
+            <a href="#" class="segment active">Genius</a>
+        </div>
+    </div>
+
+    <ul class="app-list" id="appContainer">
+        <li class="app-item" style="justify-content: center; color: #4c566c;">Cargando aplicaciones antiguas...</li>
+    </ul>
+
+    <div class="spacer"></div>
+
+    <div class="tab-bar">
+        <a href="#" class="tab-item active"><div class="tab-icon"></div>Featured</a>
+        <a href="#" class="tab-item"><div class="tab-icon"></div>Categories</a>
+        <a href="#" class="tab-item"><div class="tab-icon"></div>Top 25</a>
+        <a href="#" class="tab-item"><div class="tab-icon"></div>Search</a>
+        <a href="#" class="tab-item"><div class="tab-icon"></div>Updates</a>
+    </div>
+
+    <script>
+        // Mapeo manual de metadatos de los archivos del repositorio 'ios3-6-ipas' de Archive.org
+        // Ya que Safari en iOS antiguos no procesa fácilmente XML/JSON complejos de APIs modernas debido a certificados TLS antiguos.
+        const ipasData = [
+            {
+                title: "IM+ Lite",
+                basedOn: "Based on Skype",
+                rating: "★★★☆☆",
+                ratingsCount: "786 Ratings",
+                price: "FREE",
+                icon: "https://archive.org/download/ios3-6-ipas/icons/im_lite.png", // URLs simuladas de iconos o capturas
+                plistName: "im_lite.plist"
+            },
+            {
+                title: "BeatMaker",
+                basedOn: "Based on I Am T-Pain",
+                rating: "★★★★★",
+                ratingsCount: "15 Ratings",
+                price: "$19.99",
+                icon: "https://archive.org/download/ios3-6-ipas/icons/beatmaker.png",
+                plistName: "beatmaker.plist"
+            },
+            {
+                title: "twitterena",
+                basedOn: "Based on Tweetie",
+                rating: "☆☆☆☆☆",
+                ratingsCount: "No Ratings",
+                price: "$0.99",
+                icon: "https://archive.org/download/ios3-6-ipas/icons/twitterena.png",
+                plistName: "twitterena.plist"
+            },
+            {
+                title: "UNO™",
+                basedOn: "Based on Bejeweled® 2",
+                rating: "★★★★★",
+                ratingsCount: "6 Ratings",
+                price: "$4.99",
+                icon: "https://archive.org/download/ios3-6-ipas/icons/uno.png",
+                plistName: "uno.plist"
+            },
+            {
+                title: "JustUpdate",
+                basedOn: "Based on Twitterrific Premium",
+                rating: "★★★☆☆",
+                ratingsCount: "5 Ratings",
+                price: "FREE",
+                icon: "https://archive.org/download/ios3-6-ipas/icons/justupdate.png",
+                plistName: "justupdate.plist"
+            }
+        ];
+
+        const container = document.getElementById('appContainer');
+
+        function renderApps() {
+            container.innerHTML = ""; // Limpiar cargando
+            
+            ipasData.forEach(app => {
+                const li = document.createElement('li');
+                li.className = 'app-item';
+                
+                // Si el icono falla, ponemos un fondo por defecto estilo iOS
+                const iconUrl = app.icon;
+
+                li.innerHTML = `
+                    <img class="app-icon" src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'57\' height=\'57\' viewBox=\'0 0 57 57\'><rect width=\'57\' height=\'57\' rx=\'10\' fill=\'%23a1a1a1\'/></svg>';" />
+                    <div class="app-details">
+                        <span class="app-based-on">${app.basedOn}</span>
+                        <span class="app-title">${app.title}</span>
+                        <span class="app-rating"><span class="stars">${app.rating}</span>${app.ratingsCount}</span>
+                    </div>
+                    <a href="#" class="btn-get" onclick="installApp(event, '${app.plistName}', '${app.title}')">${app.price}</a>
+                    <div class="arrow-right"></div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        // Función para detonar la instalación nativa en iOS (OTA Installation)
+        function installApp(event, plistName, appName) {
+            event.preventDefault();
+            
+            // Confirmación simulada previa por software o delegación directa al sistema operativo
+            var confirmar = confirm("¿Deseas conectar con archive.org para instalar " + appName + "?");
+            if (confirmar) {
+                // Dirección donde debe estar alojado el archivo manifest (.plist) requerido por iOS para descargar el .ipa
+                // El .plist debe apuntar internamente al archivo .ipa alojado en https://archive.org/download/ios3-6-ipas/...
+                const basePlistUrl = "https://archive.org/download/ios3-6-ipas/manifests/" + plistName;
+                
+                // Protocolo oficial de Apple para instalación OTA empresarial/ad-hoc
+                window.location.href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(basePlistUrl);
+            }
+        }
+
+        // Renderizar al cargar la página
+        window.onload = renderApps;
+    </script>
+</body>
+</html>
