@@ -9,7 +9,6 @@
     <title>App Store - Genius</title>
     
     <style>
-        /* Estilos globales emulando iOS clásico (Helvetica, sin scroll elástico molesto) */
         body {
             margin: 0;
             padding: 0;
@@ -20,7 +19,6 @@
             user-select: none;
         }
 
-        /* Barra de navegación superior con degradado azul clásico */
         .navbar {
             background: linear-gradient(to bottom, #768ca7 0%, #3e5675 100%);
             border-bottom: 1px solid #2d3e54;
@@ -29,9 +27,13 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
         }
 
-        /* Segmented Control (New, What's Hot, Genius) */
         .segmented-control {
             display: flex;
             border: 1px solid #2a3a4e;
@@ -61,11 +63,10 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        /* Lista de aplicaciones */
         .app-list {
             background-color: #929ba6;
             list-style: none;
-            margin: 0;
+            margin: 44px 0 0 0;
             padding: 0;
         }
 
@@ -79,7 +80,6 @@
             position: relative;
         }
 
-        /* Icono de la App redondeado estilo iOS antiguo */
         .app-icon {
             width: 57px;
             height: 57px;
@@ -89,18 +89,21 @@
             background-color: #fff;
         }
 
-        /* Detalles del texto */
         .app-details {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;
         }
 
         .app-based-on {
             font-size: 11px;
             color: #4c566c;
             margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .app-title {
@@ -112,10 +115,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 160px;
         }
 
-        /* Estrellas de calificación simuladas */
         .app-rating {
             font-size: 11px;
             color: #4c566c;
@@ -125,7 +126,6 @@
             margin-right: 4px;
         }
 
-        /* Botón de precio / Obtener (GET) */
         .btn-get {
             background: linear-gradient(to bottom, #fcfcfc 0%, #cbd0d4 100%);
             border: 1px solid #707070;
@@ -146,7 +146,6 @@
             background: #b1b6ba;
         }
 
-        /* Flecha derecha clásica de las celdas de iOS */
         .arrow-right {
             width: 8px;
             height: 13px;
@@ -156,7 +155,6 @@
             background-repeat: no-repeat;
         }
 
-        /* Barra de pestañas inferior fija (Tab Bar) */
         .tab-bar {
             position: fixed;
             bottom: 0;
@@ -168,6 +166,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
+            z-index: 10;
         }
 
         .tab-item {
@@ -188,16 +187,15 @@
             width: 24px;
             height: 24px;
             margin-bottom: 2px;
-            background-color: #555; /* Simulación de icono */
+            background-color: #555;
             border-radius: 4px;
         }
         .tab-item.active .tab-icon {
             background-color: #0088ff;
         }
 
-        /* Espaciador inferior para que la lista no se tape por el TabBar */
         .spacer {
-            height: 50px;
+            height: 60px;
         }
     </style>
 </head>
@@ -207,12 +205,12 @@
         <div class="segmented-control">
             <a href="#" class="segment">New</a>
             <a href="#" class="segment">What's Hot</a>
-            <a href="#" class="segment active">Genius</a>
+            <a href="#" class="segment active">Genius (Repo)</a>
         </div>
     </div>
 
     <ul class="app-list" id="appContainer">
-        <li class="app-item" style="justify-content: center; color: #4c566c;">Cargando aplicaciones antiguas...</li>
+        <li class="app-item" style="justify-content: center; color: #4c566c;">Conectando con Archive.org...</li>
     </ul>
 
     <div class="spacer"></div>
@@ -226,100 +224,119 @@
     </div>
 
     <script>
-        // Mapeo manual de metadatos de los archivos del repositorio 'ios3-6-ipas' de Archive.org
-        // Ya que Safari en iOS antiguos no procesa fácilmente XML/JSON complejos de APIs modernas debido a certificados TLS antiguos.
-        const ipasData = [
-            {
-                title: "IM+ Lite",
-                basedOn: "Based on Skype",
-                rating: "★★★☆☆",
-                ratingsCount: "786 Ratings",
-                price: "FREE",
-                icon: "https://archive.org/download/ios3-6-ipas/icons/im_lite.png", // URLs simuladas de iconos o capturas
-                plistName: "im_lite.plist"
-            },
-            {
-                title: "BeatMaker",
-                basedOn: "Based on I Am T-Pain",
-                rating: "★★★★★",
-                ratingsCount: "15 Ratings",
-                price: "$19.99",
-                icon: "https://archive.org/download/ios3-6-ipas/icons/beatmaker.png",
-                plistName: "beatmaker.plist"
-            },
-            {
-                title: "twitterena",
-                basedOn: "Based on Tweetie",
-                rating: "☆☆☆☆☆",
-                ratingsCount: "No Ratings",
-                price: "$0.99",
-                icon: "https://archive.org/download/ios3-6-ipas/icons/twitterena.png",
-                plistName: "twitterena.plist"
-            },
-            {
-                title: "UNO™",
-                basedOn: "Based on Bejeweled® 2",
-                rating: "★★★★★",
-                ratingsCount: "6 Ratings",
-                price: "$4.99",
-                icon: "https://archive.org/download/ios3-6-ipas/icons/uno.png",
-                plistName: "uno.plist"
-            },
-            {
-                title: "JustUpdate",
-                basedOn: "Based on Twitterrific Premium",
-                rating: "★★★☆☆",
-                ratingsCount: "5 Ratings",
-                price: "FREE",
-                icon: "https://archive.org/download/ios3-6-ipas/icons/justupdate.png",
-                plistName: "justupdate.plist"
-            }
-        ];
+        const repoUrl = "https://archive.org/download/ios3-6-ipas/";
+        // CORS proxy público para permitir que JavaScript lea repositorios externos sin bloqueos en navegadores
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(repoUrl);
 
-        const container = document.getElementById('appContainer');
-
-        function renderApps() {
-            container.innerHTML = ""; // Limpiar cargando
-            
-            ipasData.forEach(app => {
-                const li = document.createElement('li');
-                li.className = 'app-item';
+        async function fetchIpas() {
+            const container = document.getElementById('appContainer');
+            try {
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
                 
-                // Si el icono falla, ponemos un fondo por defecto estilo iOS
-                const iconUrl = app.icon;
+                // Procesar el HTML que devuelve Archive.org buscando enlaces .ipa
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+                const links = doc.querySelectorAll('a');
+                
+                let ipaFiles = [];
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && href.endsWith('.ipa')) {
+                        // Limpiar el nombre quitando extensiones y guiones bajos para que se vea estético
+                        let cleanTitle = href.replace('.ipa', '').replace(/_/g, ' ').replace(/-/g, ' ');
+                        ipaFiles.push({
+                            fileName: href,
+                            title: cleanTitle
+                        });
+                    }
+                });
 
-                li.innerHTML = `
-                    <img class="app-icon" src="${iconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'57\' height=\'57\' viewBox=\'0 0 57 57\'><rect width=\'57\' height=\'57\' rx=\'10\' fill=\'%23a1a1a1\'/></svg>';" />
-                    <div class="app-details">
-                        <span class="app-based-on">${app.basedOn}</span>
-                        <span class="app-title">${app.title}</span>
-                        <span class="app-rating"><span class="stars">${app.rating}</span>${app.ratingsCount}</span>
-                    </div>
-                    <a href="#" class="btn-get" onclick="installApp(event, '${app.plistName}', '${app.title}')">${app.price}</a>
-                    <div class="arrow-right"></div>
-                `;
-                container.appendChild(li);
-            });
+                if (ipaFiles.length === 0) {
+                    container.innerHTML = `<li class="app-item" style="justify-content: center;">No se encontraron archivos .ipa en este directorio.</li>`;
+                    return;
+                }
+
+                container.innerHTML = ""; // Limpiar mensaje de carga
+
+                ipaFiles.forEach(app => {
+                    const li = document.createElement('li');
+                    li.className = 'app-item';
+                    
+                    // Generamos estrellas aleatorias para simular el look clásico
+                    const stars = "★".repeat(Math.floor(Math.random() * 3) + 3) + "☆".repeat(2);
+                    
+                    li.innerHTML = `
+                        <img class="app-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='57' height='57' viewBox='0 0 57 57'><rect width='57' height='57' rx='12' fill='%231f7cd3'/><path d='M28.5 12 L38 38 L19 38 Z' fill='white'/></svg>"/>
+                        <div class="app-details">
+                            <span class="app-based-on">Archive.org File</span>
+                            <span class="app-title">${app.title}</span>
+                            <span class="app-rating"><span class="stars">${stars.substring(0,5)}</span> Reciente</span>
+                        </div>
+                        <a href="#" class="btn-get" onclick="installOta(event, '${app.fileName}', '${app.title}')">FREE</a>
+                        <div class="arrow-right"></div>
+                    `;
+                    container.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<li class="app-item" style="justify-content: center; color: red;">Error al conectar con el servidor.</li>`;
+            }
         }
 
-        // Función para detonar la instalación nativa en iOS (OTA Installation)
-        function installApp(event, plistName, appName) {
+        // Función mágica que genera un archivo .plist dinámico en base64 para engañar a iOS y forzar la instalación
+        function installOta(event, fileName, appName) {
             event.preventDefault();
             
-            // Confirmación simulada previa por software o delegación directa al sistema operativo
-            var confirmar = confirm("¿Deseas conectar con archive.org para instalar " + appName + "?");
-            if (confirmar) {
-                // Dirección donde debe estar alojado el archivo manifest (.plist) requerido por iOS para descargar el .ipa
-                // El .plist debe apuntar internamente al archivo .ipa alojado en https://archive.org/download/ios3-6-ipas/...
-                const basePlistUrl = "https://archive.org/download/ios3-6-ipas/manifests/" + plistName;
-                
-                // Protocolo oficial de Apple para instalación OTA empresarial/ad-hoc
-                window.location.href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(basePlistUrl);
+            const ipaDirectUrl = repoUrl + fileName;
+            
+            // Estructura XML .plist obligatoria que exige iOS para las descargas "Over-The-Air"
+            const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE playbook PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>assets</key>
+            <array>
+                <dict>
+                    <key>kind</key>
+                    <dataType>software-package</dataType>
+                    <key>url</key>
+                    <string>${ipaDirectUrl}</string>
+                </dict>
+            </array>
+            <key>metadata</key>
+            <dict>
+                <key>bundle-identifier</key>
+                <string>com.archive.download.${fileName.replace(/[^a-zA-JS0-9]/g, '')}</string>
+                <key>bundle-version</key>
+                <string>1.0</string>
+                <key>kind</key>
+                <string>software</string>
+                <key>title</key>
+                <string>${appName}</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>`;
+
+            // Convertimos el plist a una URL codificada para que iOS lo lea directamente desde Safari
+            const plistBlobUrl = "data:text/xml;base64," + btoa(unescape(encodeURIComponent(plistContent)));
+            
+            if (confirm(`¿Quieres intentar instalar la aplicación "${appName}" directamente en tu dispositivo desde Archive.org?`)) {
+                window.location.href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(plistBlobUrl);
             }
         }
 
-        // Renderizar al cargar la página
-        window.onload = renderApps;
+        window.onload = fetchIpas;
     </script>
 </body>
 </html>
+
+
+
+
